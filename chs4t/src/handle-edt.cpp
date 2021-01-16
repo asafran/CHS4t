@@ -1,0 +1,179 @@
+#include    "handle-edt.h"
+#include    "hardware-signals.h"
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+HandleEDT::HandleEDT(QObject *parent) : Device(parent)
+  , brakeKey(0)
+  , releaseKey(0)
+  , pos(POS_RELEASE)
+  , pos_ref(pos)
+  , control_signal(0.0)
+  , dropPositions(false)
+  , EDTState(false)
+  , msw()
+{
+    std::fill(K.begin(), K.end(), 0.0);
+
+    connect(&motionTimer, &Timer::process, this, &HandleEDT::slotHandleMove);
+    motionTimer.setTimeout(0.1);
+    motionTimer.firstProcess(true);
+    motionTimer.start();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+HandleEDT::~HandleEDT()
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void HandleEDT::preStep(state_vector_t &Y, double t)
+{
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+
+    if(pos != pos_prev)
+    {
+        switch (pos)
+        {
+        case POS_RELEASE:
+
+            control_signal = 0.0;
+            break;
+
+        case POS_HOLD:
+
+            control_signal = -1.0;
+            break;
+
+        case POS_BRAKE:
+
+            control_signal = 1.0;
+            break;
+        }
+        msw.setPos(pos);
+        pos_prev = pos;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void HandleEDT::ode_system(const state_vector_t &Y,
+                           state_vector_t &dYdt,
+                           double t)
+{
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+    Q_UNUSED(t)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void HandleEDT::load_config(CfgReader &cfg)
+{
+    QString secName = "Device", ids, ba;
+
+    for (size_t i = 1; i < K.size(); ++i)
+    {
+        QString coeff = QString("K%1").arg(i);
+        cfg.getDouble(secName, coeff, K[i]);
+    }
+    secName = "SM";
+    if(cfg.getString(secName, "BA", ba) && cfg.getString(secName, "ID", ids))
+    {
+        msw = MultiSwitch(ids, ba);
+        msw.setPos(POS_RELEASE);
+    }
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void HandleEDT::stepKeysControl(double t, double dt)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
+    if (getKeyState(brakeKey))
+    {
+        pos_ref = POS_BRAKE;
+    }
+    else
+    {
+        if (getKeyState(releaseKey))
+        {
+            pos_ref = POS_RELEASE;
+        }
+        else
+        {
+            if (pos == POS_BRAKE)
+                pos_ref = POS_HOLD;
+            else
+                pos_ref = pos;
+        }
+    }
+
+    motionTimer.step(t, dt);
+}
+
+void HandleEDT::stepExternalControl(double t, double dt)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+
+    if (control_signals.analogSignal[EDT_BRAKE].is_active &&
+        control_signals.analogSignal[EDT_RELEASE].is_active    )
+    {
+        if (static_cast<bool>(control_signals.analogSignal[EDT_BRAKE].cur_value))
+        {
+            pos_ref = POS_BRAKE;
+        }
+
+        else if (static_cast<bool>(control_signals.analogSignal[EDT_RELEASE].cur_value))
+        {
+            pos_ref = POS_RELEASE;
+        }
+
+        else
+        {
+            pos_ref = POS_HOLD;
+        }
+    }
+
+    if (control_signals.analogSignal[EDT_SBROS].is_active && control_signals.analogSignal[EDT_SBROS].cur_value == 1)
+    {
+        dropPositions = true;
+    }
+
+    if (control_signals.analogSignal[EDT_OFF].is_active && control_signals.analogSignal[EDT_OFF].cur_value == 1)
+    {
+        EDTState = false;
+    }
+    if (control_signals.analogSignal[EDT_ON].is_active && control_signals.analogSignal[EDT_ON].cur_value == 1)
+    {
+        EDTState = true;
+    }
+
+//    if (control_signals.analogSignal[EDT_CHECK_RT])
+
+    motionTimer.step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void HandleEDT::slotHandleMove()
+{
+    pos += pos_ref - pos;
+
+    pos = cut(pos, static_cast<int>(POS_RELEASE), static_cast<int>(POS_BRAKE));
+}

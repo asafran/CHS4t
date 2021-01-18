@@ -124,9 +124,8 @@ void CHS4T::initAirSupplySubsystem()
     spareReservoir = new Reservoir(0.078);
     brakeRefRes = new Reservoir(0.004);
 
-
-
-
+    pvs["b348"] = new PneumoV(this);
+    pvs["o358"] = new PneumoV(this);
 
 }
 
@@ -308,7 +307,7 @@ void CHS4T::initTractionControl()
         {
             *dcmotor = new DCMotor();
             (*dcmotor)->setCustomConfigDir(config_dir);
-            (*dcmotor)->read_custom_config(config_dir + QDir::separator() + "HB-412K");
+            (*dcmotor)->read_custom_config(config_dir + QDir::separator() + "AL4442nP");
 
             //connect(motor[i], &DCMotor::soundSetPitch, this, &VL60k::soundSetPitch);
             //connect(motor[i], &DCMotor::soundSetVolume, this, &VL60k::soundSetVolume);
@@ -397,7 +396,7 @@ void CHS4T::initEDT()
     {
         *gen = new Generator();
         (*gen)->setCustomConfigDir(config_dir);
-        (*gen)->read_custom_config(config_dir + QDir::separator() + "AL-4846dT");
+        (*gen)->read_custom_config(config_dir + QDir::separator() + "AL4442nP");
     }
 
 
@@ -433,7 +432,7 @@ void CHS4T::initSupportEquipment()
 {
 
     motor_fan_r = new DCMotorFan();
-    motor_fan_r->read_custom_config(config_dir + QDir::separator() + "dc-motor-fan-r");
+    motor_fan_r->read_custom_config(config_dir + QDir::separator() + "motor-fan-r");
 
     std::array<DCMotorFan *, 6>::iterator it;
     for (it = motor_fan.begin(); it != motor_fan.end(); ++it)
@@ -441,6 +440,8 @@ void CHS4T::initSupportEquipment()
 
     motor_fan[0]->read_custom_config(config_dir + QDir::separator() + "motor-fan");
     motor_fan[1]->read_custom_config(config_dir + QDir::separator() + "motor-fan");
+    motor_fan[0]->stateContact(true);
+    motor_fan[1]->stateContact(true);
 
     motor_fan[2]->read_custom_config(config_dir + QDir::separator() + "oil-fan");
     motor_fan[3]->read_custom_config(config_dir + QDir::separator() + "oil-fan");
@@ -484,8 +485,8 @@ void CHS4T::initSupportEquipment()
     {
         reckdyn[i]->setID(readed[i]);
     }
-    reckdyn[COMPRESSOR0]->toggleWinter();
-    reckdyn[COMPRESSOR1]->toggleWinter();
+    //reckdyn[COMPRESSOR0]->toggleWinter();
+    //reckdyn[COMPRESSOR1]->toggleWinter();
 
     std::array<QString, 2> c_readed;
     cfg.getString("SM", "P0", readed[0]);
@@ -611,8 +612,8 @@ void CHS4T::initSounds()
     connect(generator[0], &Generator::soundSetVolume, this, &CHS4T::soundSetVolume);
 
 
-    connect(horn, &CHS4tHorn::soundPlay, this, &CHS4T::soundPlay);
-    connect(horn, &CHS4tHorn::soundStop, this, &CHS4T::soundStop);
+    //connect(horn, &CHS4tHorn::soundPlay, this, &CHS4T::soundPlay);
+    //connect(horn, &CHS4tHorn::soundStop, this, &CHS4T::soundStop);
 
 
     connect(speed_meter, &SL2M::soundSetVolume, this, &CHS4T::soundSetVolume);

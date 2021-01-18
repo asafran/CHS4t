@@ -46,6 +46,8 @@ private:
     /// Ток заряда/разряда
     double  Ib;
 
+    double Unom;
+
     /// Максимальная ЭДС
     double  Emax;
 
@@ -55,8 +57,16 @@ private:
     /// Емкость, А*ч
     double  C;
 
+    double  C2;
+
     /// Напряжение заряда
     double  U_gen;
+
+    double  U_in;
+
+    double  time;
+
+    bool mode;
 
     QSharedMemory voltS;
     QSharedMemory amperimetrS;

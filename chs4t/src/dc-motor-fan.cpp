@@ -53,7 +53,7 @@ void DCMotorFan::preStep(state_vector_t& Y, double t)
 {
     Q_UNUSED(t)
 
-    emit started(Y[0] > 100.0);
+    emit started(Y[0] > 80.0 + std::numeric_limits<double>::epsilon());
     //emit soundSetPitch(soundName, static_cast<float>(Y[0] / omega_nom));
 }
 

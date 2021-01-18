@@ -35,6 +35,7 @@ void Reckdyn::preStep(state_vector_t &Y, double t)
     Q_UNUSED(t)
     Q_UNUSED(Y)
 
+    Y[0] = cut(Y[0], 0.0, 1.0);
     if(contact.lock())
     {
         bool *data = (bool*)contact.data();

@@ -8,7 +8,7 @@ class PneumoV : public QObject
 {
     Q_OBJECT
 public:
-    PneumoV();
+    PneumoV(QObject *parent = Q_NULLPTR);
     PneumoV(QString id, QObject *parent = Q_NULLPTR);
 
     void setPin(double P) { Pin = P; }

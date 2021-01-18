@@ -40,7 +40,7 @@ void OverloadRelays::preStep(state_vector_t &Y, double t)
         if(it->sw->lock())
         {
             bool *data = (bool*)it->sw->data();
-            *data = (it->current > it->trig_current) || it->override;
+            *data = (it->current > (it->trig_current + std::numeric_limits<double>::epsilon())) || it->override;
             it->sw->unlock();
         }
     }
@@ -64,7 +64,7 @@ void OverloadRelays::ode_system(const state_vector_t &Y,
 void OverloadRelays::load_config(CfgReader &cfg)
 {
 
-    QDomNode secNode = cfg.getFirstSection("Relays");
+    QDomNode secNode = cfg.getFirstSection("TED");
 
     //num_bt << "701" << "008" << "009" << "145" << "146" << "148" << "860" << "861" << "851" << "0271" << "0261" << "0251" << "0272" << "0262" << "0252" << "06X1" << "06X2" << "BUTT" << "GROUND_RS1" << "GROUND_RS2";
 
@@ -83,6 +83,7 @@ void OverloadRelays::load_config(CfgReader &cfg)
         secNode = cfg.getNextSection();
     }
 
+    secNode = cfg.getFirstSection("Relays");
     while (!secNode.isNull())
     {
         relay_t relay;

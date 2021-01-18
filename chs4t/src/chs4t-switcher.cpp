@@ -51,15 +51,4 @@ void CHS4TSwitcher::preStep(state_vector_t &Y, double t)
         setPos(state);
     }
 }
-/*
-void CHS4TSwitcher::load_config(CfgReader &cfg)
-{
-    QString ids, ab, secName = objectName();
 
-    if(cfg.getString(secName, "BA", ab) && cfg.getString(secName, "ID", ids))
-    {
-        initialize(ids,ab);
-    }
-
-}
-*/

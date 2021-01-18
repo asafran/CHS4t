@@ -23,8 +23,6 @@ public:
 
     double getQ();
 
-private:
-
     enum
     {
         T71 = 0,
@@ -33,6 +31,10 @@ private:
         NZ31 = 3,
         NUM_PVS = 4
     };
+
+private:
+
+
 
     std::array<PneumoV *,NUM_PVS> pvs;
 
@@ -67,10 +69,8 @@ signals:
 
 public slots:
 
-    void overridePV(QString &key);
+    void overridePV(const int &key);
 
-    void overrideReversor();
-    void override071();
 
 };
 

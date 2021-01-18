@@ -35,7 +35,7 @@ void RelaySM::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
-    if(S.lock() && !overrided)
+    if(!overrided && S.lock())
     {
         bool *data = (bool*)S.data();
         coil = *data;
@@ -49,11 +49,7 @@ void RelaySM::preStep(state_vector_t &Y, double t)
         setPos(state);
         emit stateChanged(state);
         old_state = state;
-        if (state == 1)
-            emit soundPlay("GV_On");
-
-        if (state == 0)
-            emit soundPlay("GV_Off");
+        emit soundPlay("relay");
     }
 
 }
@@ -78,50 +74,7 @@ void RelaySM::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-/*
-void RelaySM::load_config(CfgReader &cfg)
-{
 
-    int order = 1;
-    if (cfg.getInt("Device", "Order", order))
-    {
-        y.resize(static_cast<size_t>(order));
-        std::fill(y.begin(), y.end(), 0);
-
-    }
-
-    QString secName = objectName();
-    double V;
-    if (cfg.getDouble(secName, "Vu", V))
-        Vu = V;
-
-    if (cfg.getDouble(secName, "Vd", V))
-        Vd = V;
-
-    QString ids, ab;
-
-    if(cfg.getString(secName, "BA", ab) && cfg.getString(secName, "ID", ids))
-    {
-        initialize(ids,ab);
-    }
-
-    QString id = "0";
-    cfg.getString(secName, "S", id);
-    S.setKey(id);
-    S.attach();
-
-
-}
-void RelaySM::override()
-{
-    overrided = !overrided;
-}
-void RelaySM::override(const bool &pos)
-{
-    overrided = true;
-    state = pos;
-}
-*/
 void RelaySM::enable()
 {
     overrided = false;

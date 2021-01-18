@@ -126,7 +126,7 @@ void CHS4T::stepTractionControl(double t, double dt)
 void CHS4T::stepAirSupplySubsystem(double t, double dt)
 {
     mainReservoir->setAirFlow(mainFlow);
-    mainReservoir->step(t, dt);
+
 
     for (size_t i = 0; i < motor_compressor.size(); ++i)
     {
@@ -139,7 +139,7 @@ void CHS4T::stepAirSupplySubsystem(double t, double dt)
     double compressor_flow = motor_compressor[0]->getAirFlow() + motor_compressor[1]->getAirFlow();
 
     mainReservoir->setFlowCoeff(1e-3);
-
+    mainReservoir->step(t, dt);
 
     gvSplit->setP_out1(gvReservoir->getPressure());
     gvSplit->setP_out2(reservoir903->getPressure());
@@ -243,6 +243,10 @@ void CHS4T::stepBrakesEquipment(double t, double dt)
     pvs["b348"]->overridePV(!pvs["o348"]->getState());
     pvs["b348"]->setPin(airSplit->getP_in());
     pvs["b348"]->setPout(dako->getPy());
+    pvs["o358"]->overridePV(!pvs["b358"]->getState());
+    pvs["o358"]->setPin(brakeRefRes->getPressure());
+    pvs["o358"]->setPout(0.0);
+    pvs["o358"]->setK1(0.5);
 
     dako->setPgr(mainReservoir->getPressure());
     dako->setPkvt(zpk->getPressure2());
@@ -259,7 +263,7 @@ void CHS4T::stepBrakesEquipment(double t, double dt)
     airSplit->setQ_in(electroAirDistr->getQbc_out());
     airSplit->step(t, dt);
 
-    brakeRefRes->setAirFlow(airSplit->getQ_out2());
+    brakeRefRes->setAirFlow(airSplit->getQ_out2() - pvs["o358"]->getQ());
     brakeRefRes->step(t, dt);
 
     electroAirDistr->setPbc_in(airSplit->getP_in());

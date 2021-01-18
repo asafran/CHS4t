@@ -13,7 +13,7 @@ void CHS4T::stepEDT(double t, double dt)
     {
         generator[i]->setUf(brakeRekdyn->getU()/6);
         generator[i]->setOmega(wheel_omega[i] * ip);
-        generator[i]->setRt(3.35);
+        generator[i]->setRt(0.6);
         generator[i]->step(t, dt);
     }
 

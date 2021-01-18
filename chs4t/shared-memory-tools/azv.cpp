@@ -53,7 +53,10 @@ void AZV::preStep(state_vector_t &Y, double t)
         contact.unlock();
     }
     if(hs_p(Y[1] - Q) || hs_p((I/I_nom) - 3))
+    {
         blink = true;
+        emit overload(blink);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -81,43 +84,7 @@ void AZV::ode_system(const state_vector_t &Y,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-/*
-void AZV::load_config(CfgReader &cfg)
-{
 
-    int order = 2;
-    if (cfg.getInt("Device", "Order", order))
-    {
-        y.resize(static_cast<size_t>(order));
-        std::fill(y.begin(), y.end(), 0);
-
-    }
-
-    QString secName = objectName();
-    double conf_data;
-    if (cfg.getDouble(secName, "I_nom", conf_data))
-        I_nom = conf_data;
-
-    if (cfg.getDouble(secName, "R", conf_data))
-        R = conf_data;
-
-    if (cfg.getDouble(secName, "Q", conf_data))
-        Q = conf_data;
-
-    if (cfg.getDouble(secName, "N", conf_data))
-        N = conf_data;
-
-
-    QString id = "0";
-    cfg.getString(secName, "S", id);
-    S.setKey(id);
-    S.attach();
-    cfg.getString(secName, "contact", id);
-    contact.setKey(id);
-    contact.attach();
-
-}
-*/
 void AZV::toggle()
 {
     if (blink)

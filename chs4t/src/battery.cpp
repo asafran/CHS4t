@@ -10,10 +10,13 @@ Battery::Battery(QObject *parent) : Device(parent)
   , Idop(0.0)
   , Is(0.0)
   , Ib(0.0)
+  , Unom(62.5)
   , Emax(96.0)
   , Emin(84.0)
   , C(450.0)
   , U_gen(0.0)
+  , time(2.0)
+  , mode(false)
 {
 
 }
@@ -31,7 +34,7 @@ Battery::~Battery()
 //------------------------------------------------------------------------------
 double Battery::getVoltage() const
 {
-    return pf(getY(0) - r * In);
+    return pf(getY(0)+getY(1) - r * (In + Idop));
 }
 
 //------------------------------------------------------------------------------
@@ -42,6 +45,13 @@ double Battery::getCargeCurrent() const
     return Ib;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Battery::getStabilizerCurrent() const
+{
+    return hs_p(U_gen) * (hs_p(Ib) + In + Idop);
+}
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -63,7 +73,8 @@ void Battery::setStarterCurrent(double Is)
 //------------------------------------------------------------------------------
 void Battery::setChargeVoltage(double U_gen)
 {
-    this->U_gen = cut(U_gen, 0.0, 62.5);
+    this->U_in = cut(U_gen, 0.0, Unom);
+
 }
 
 //------------------------------------------------------------------------------
@@ -73,7 +84,13 @@ void Battery::preStep(state_vector_t &Y, double t)
 {
     Q_UNUSED(t)
 
+    Y[2] *= hs_p(U_in);
     Y[0] = cut(Y[0], 0.0, Emax);
+    Y[1] = cut(Y[1], 0.0, 15.0);
+    Y[2] = cut(Y[2], 0.0, 100.0);
+    U_gen = U_in  * hs_p(Y[2] - time);
+
+    double y = Y[0] + Y[1];
 
     if(amperimetrS.lock())
     {
@@ -81,7 +98,7 @@ void Battery::preStep(state_vector_t &Y, double t)
         In = *data;
         amperimetrS.unlock();
     }
-    if (In > 110.0)
+    if (In + Idop> 110.0 + std::numeric_limits<double>::epsilon())
     {
         if(sw.lock())
         {
@@ -92,19 +109,19 @@ void Battery::preStep(state_vector_t &Y, double t)
 
     }
 
-    if (U_gen <= Y[0])
+    if (U_gen <= y - std::numeric_limits<double>::epsilon())
     {
         Ib = -(In + Idop);
     }
     else
     {
-        Ib = cut((U_gen - Y[0]), 0.0, 1.0) * 40.0;
+        Ib = cut((U_gen - y), 0.0, 1.0) * 40.0;
     }
 
     if(voltS.lock())
     {
         double *data = (double*)voltS.data();
-        *data = max(Y[0], U_gen);
+        *data = max(getVoltage(), U_gen);
         voltS.unlock();
     }
 }
@@ -119,7 +136,10 @@ void Battery::ode_system(const state_vector_t &Y,
     Q_UNUSED(Y)
     Q_UNUSED(t)
 
-    dYdt[0] = (Ib - Is) * (Emax - Emin) / C / 3600;
+    dYdt[0] = Ib * (Emax - Emin) / (C+(C2*static_cast<double>(mode))) / 3600;
+    double U_up = U_gen - 48.1;
+    dYdt[1] = cut((U_up - Y[1]), -1.0, 1.0);
+    dYdt[2] = hs_p(U_in - 2.0);
 }
 
 //------------------------------------------------------------------------------
@@ -131,12 +151,15 @@ void Battery::load_config(CfgReader &cfg)
 
     cfg.getDouble(secName, "Emax", Emax);
 
-    setY(0, 60.0);
+    setY(0, 48.0);
 
     cfg.getDouble(secName, "Emin", Emin);
     cfg.getDouble(secName, "r", r);
     cfg.getDouble(secName, "Rd", Rd);
     cfg.getDouble(secName, "Capacity", C);
+    cfg.getDouble(secName, "Capacity2", C2);
+    cfg.getDouble(secName, "Unom", Unom);
+    cfg.getDouble(secName, "Time", time);
 
     secName = "SM";
     cfg.getString(secName, "SW", id);

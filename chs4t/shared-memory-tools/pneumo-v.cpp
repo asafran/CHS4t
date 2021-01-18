@@ -1,7 +1,8 @@
 #include "pneumo-v.h"
 
-PneumoV::PneumoV()
-  : overrided(false)
+PneumoV::PneumoV(QObject *parent)
+  : QObject(parent)
+  , overrided(false)
   , state(false)
   , old_state(false)
   , pv()

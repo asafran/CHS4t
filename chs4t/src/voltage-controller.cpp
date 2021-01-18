@@ -22,8 +22,8 @@ void VoltageController::preStep(state_vector_t &Y, double t)
     if(sw851.lock())
     {
         bool *data = (bool*)sw851.data();
-        *data = (!*data && ( Utransf > (Uenable - std::numeric_limits<double>::epsilon())))
-                || (*data && ( Utransf > (Udisable - std::numeric_limits<double>::epsilon())));
+        *data = (!*data && ( Utransf > (Uenable + std::numeric_limits<double>::epsilon())))
+                || (*data && ( Utransf > (Udisable + std::numeric_limits<double>::epsilon())));
         sw851.unlock();
     }
 

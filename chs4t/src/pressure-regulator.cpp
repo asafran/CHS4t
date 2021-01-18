@@ -42,13 +42,13 @@ void PressureRegulator::check()
     {
         double dp = p_cur - p_prev;
 
-        if (p_cur < p_min)
+        if (p_cur < p_min - std::numeric_limits<double>::epsilon())
                 state = 1.0;
 
-        if (p_cur > p_max)
+        if (p_cur > p_max + std::numeric_limits<double>::epsilon())
                 state = 0.0;
 
-        if ( (p_cur >= p_min) && (p_cur <= p_max) )
+        if ( (p_cur >= p_min + std::numeric_limits<double>::epsilon()) && (p_cur <= p_max - std::numeric_limits<double>::epsilon()) )
         {
             state = hs_p(dp);
         }

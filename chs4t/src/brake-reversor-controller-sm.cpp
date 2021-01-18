@@ -104,22 +104,17 @@ void BrakeReversorController::ode_system(const state_vector_t &Y,
                             double t)
 {
     Q_UNUSED(t)
+    Q_UNUSED(Y)
 
     double s_pv_h = hs_p(pvs[H71]->getQ());
     double s_pv_t = -hs_p(pvs[T71]->getQ());
-/*
-    double s_on_target = s_pv_h * hs_p(Y[0] - 1.0);
-    double s_off_target = s_pv_t * hs_p(Y[0]);
-*/
+
     dYdt[0] = (s_pv_h * Vu)+(s_pv_t * Vd);
 
 
     double s_pv_f = hs_p(pvs[VP31]->getQ());
     double s_pv_b = -hs_p(pvs[NZ31]->getQ());
-/*
-    s_on_target = s_pv_f - hs_p(Y[1] - 1.0); //0
-    s_off_target = s_pv_b * hs_p(Y[1]);//1
-*/
+
     dYdt[1] = (s_pv_f * Vu)+(s_pv_b * Vd);
 }
 
@@ -139,15 +134,9 @@ void BrakeReversorController::load_config(CfgReader &cfg)
 
     }
 
-    double vu, vd, pressure;
-    if(cfg.getDouble(secName, "Vu", vu) && cfg.getDouble(secName, "Vd", vd) && cfg.getDouble(secName, "Pressure", pressure))
-    {
-        Vu = vu;
-        Vd = vd;
-        w_pressure = pressure;
-    }
-
-
+    cfg.getDouble(secName, "Vu", Vu);
+    cfg.getDouble(secName, "Vd", Vd);
+    cfg.getDouble(secName, "Pressure", w_pressure);
 
     secName = "Reversor";
     QString ids, ab;
@@ -162,11 +151,13 @@ void BrakeReversorController::load_config(CfgReader &cfg)
     pvs[VP31] = new PneumoV(id,this);
     cfg.getString(secName, "PVB", id);
     pvs[NZ31] = new PneumoV(id,this);
+
     secName = "PR";
     if(cfg.getString(secName, "BA", ab) && cfg.getString(secName, "ID", ids))
     {
         c071_sw = MultiSwitch(ids,ab);
     }
+
     cfg.getString(secName, "PVH", id);
     pvs[H71] = new PneumoV(id,this);
     cfg.getString(secName, "PVT", id);
@@ -183,16 +174,8 @@ double BrakeReversorController::getQ()
     return Q;
 }
 
-void BrakeReversorController::overridePV(QString &key)
+void BrakeReversorController::overridePV(const int &key)
 {
-
+    pvs[key]->overridePV(true);
 }
 
-void BrakeReversorController::overrideReversor()
-{
-
-}
-void BrakeReversorController::override071()
-{
-
-}

@@ -43,7 +43,7 @@ CHS4T::CHS4T() : Vehicle()
 //------------------------------------------------------------------------------
 CHS4T::~CHS4T()
 {
-
+    process->kill();
 }
 
 //------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ void CHS4T::initialization()
 
     initRegistrator();
 
-    //initSounds();
+    initSounds();
 
     //initTapSounds();
 

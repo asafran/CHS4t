@@ -12,9 +12,9 @@ void CHS4T::stepDebugMsg(double t, double dt)
         .arg(railway_coord / 1000.0, 5, 'f', 1)
         .arg(velocity * Physics::kmh, 5, 'f', 1)
         .arg(BrakeReg->getAngle(), 10, 'f', 4)
-        .arg(pvs["b348"]->getQ(), 10, 'f', 10)
-        .arg(pvs["o348"]->getQ(), 10, 'f', 10)
-        .arg(battery->getCargeCurrent(), 10, 'f', 2)
-        .arg(transformer015->getY(0), 10, 'f', 2)
+        .arg(reservoir903->getPressure(), 10, 'f', 10)
+        .arg(motor_fan[4]->getY(0), 10, 'f', 10)
+        .arg(motor_fan[4]->getU(), 10, 'f', 2)
+        .arg(brakeRekdyn->getAngle(), 10, 'f', 2)
         .arg(pantographs[0]->getUout());
 }

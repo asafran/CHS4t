@@ -33,14 +33,25 @@ void OverloadRelays::preStep(state_vector_t &Y, double t)
     Q_UNUSED(t)
     Q_UNUSED(Y)
 
-    QMap<QString, relay_t>::iterator it = relays.begin();
 
-    for(; it != relays.end(); ++it)
+
+    for(QMap<QString, relay_t>::iterator it = relays.begin(); it != relays.end(); ++it)
     {
         if(it->sw->lock())
         {
             bool *data = (bool*)it->sw->data();
-            *data = (it->current > (it->trig_current + std::numeric_limits<double>::epsilon())) || it->override;
+            *data = it->current > (it->trig_current + std::numeric_limits<double>::epsilon());
+            it->sw->unlock();
+        }
+    }
+
+
+    for(QVector<relay_t>::iterator it = ted_relays.begin(); it != ted_relays.end(); ++it)
+    {
+        if(it->sw->lock())
+        {
+            bool *data = (bool*)it->sw->data();
+            *data = it->current > (it->trig_current + std::numeric_limits<double>::epsilon());
             it->sw->unlock();
         }
     }
@@ -77,7 +88,6 @@ void OverloadRelays::load_config(CfgReader &cfg)
 
         relay.sw->setKey(key);
         relay.sw->attach();
-
         ted_relays.append(relay);
 
         secNode = cfg.getNextSection();

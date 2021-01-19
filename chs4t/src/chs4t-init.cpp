@@ -164,7 +164,7 @@ void CHS4T::initRelays()
 
         RelaySM *relay = new RelaySM(s, vu, vd, ids, ba, this);
         relay->setObjectName(name);
-        //connect(relay, &Relay::changed, this, &CHS4T::setSignal);
+        connect(relay, &RelaySM::soundPlay , this, &CHS4T::soundPlay);
         relays.append(relay);
 
         secNode = cfg.getNextSection();
@@ -568,17 +568,6 @@ void CHS4T::initSounds()
         connect(pantographs[i], &Pantograph::soundPlay, this, &CHS4T::soundPlay);
     }
 
-/*
-    for (size_t i = 0; i < NUM_PANTOGRAPHS; ++i)
-    {
-        pantoSwitcher[i]->setSoundName("tumbler");
-        connect(pantoSwitcher[i], &Switcher::soundPlay, this, &CHS4T::soundPlay);
-    }
-
-    fastSwitchSw->setSoundName("tumbler");
-    connect(fastSwitchSw, &Switcher::soundPlay, this, &CHS4T::soundPlay);
-*/
-
     connect(brakeCrane, &BrakeCrane::soundPlay, this, &CHS4T::soundPlay);
     connect(brakeCrane, &BrakeCrane::soundSetVolume, this, &CHS4T::soundSetVolume);
 
@@ -592,9 +581,6 @@ void CHS4T::initSounds()
         motor_compressor[i]->setSoundName(QString("kompressor%1").arg(i+1));
         connect(motor_compressor[i], &DCMotorCompressor::soundPlay, this, &CHS4T::soundPlay);
         connect(motor_compressor[i], &DCMotorCompressor::soundStop, this, &CHS4T::soundStop);
-
-        //mk_switcher[i]->setSoundName("tumbler");
-        //connect(mk_switcher[i], &Switcher::soundPlay, this, &CHS4T::soundPlay);
     }
 
 
@@ -606,6 +592,8 @@ void CHS4T::initSounds()
 
 
     connect(autoTrainStop, &AutoTrainStop::soundSetVolume, this, &CHS4T::soundSetVolume);
+
+    connect(gv, &ProtectiveDeviceSM::soundSetVolume, this, &CHS4T::soundSetVolume);
 
 
     connect(generator[0], &Generator::soundSetPitch, this, &CHS4T::soundSetPitch);

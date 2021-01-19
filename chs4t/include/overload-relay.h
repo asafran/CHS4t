@@ -15,12 +15,10 @@ struct relay_t
 
     double current;
     double trig_current;
-    bool override;
 
     relay_t()
         : current(0)
         , trig_current(1)
-        , override(false)
     {
         sw = new QSharedMemory("0");
     }

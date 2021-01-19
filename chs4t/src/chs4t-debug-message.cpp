@@ -13,7 +13,7 @@ void CHS4T::stepDebugMsg(double t, double dt)
         .arg(velocity * Physics::kmh, 5, 'f', 1)
         .arg(BrakeReg->getAngle(), 10, 'f', 4)
         .arg(reservoir903->getPressure(), 10, 'f', 10)
-        .arg(motor_fan[4]->getY(0), 10, 'f', 10)
+        .arg(motor[0]->getIa(), 10, 'f', 10)
         .arg(generator[0]->getIa(), 10, 'f', 2)
         .arg(transformer015->getY(0), 10, 'f', 2)
         .arg(vu[0]->getU_out());

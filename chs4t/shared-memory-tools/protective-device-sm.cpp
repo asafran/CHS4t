@@ -106,6 +106,4 @@ void ProtectiveDeviceSM::load_config(CfgReader &cfg)
     S2.attach();
     cfg.getString(secName, "P", id);
     p_contact = new PressureRegulator(false,id,0.65,0.70);
-
-
 }

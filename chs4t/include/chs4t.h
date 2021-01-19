@@ -23,7 +23,6 @@
 #include    <QProcess>
 #include    "reckdyn.h"
 #include    "battery.h"
-#include    "voltage-regulator.h"
 #include    "km-21kr2.h"
 #include    "rectifier.h"
 #include    "trac-transformer.h"

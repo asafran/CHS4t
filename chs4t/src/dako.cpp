@@ -33,6 +33,8 @@ Dako::Dako(QObject* parent) : Device(parent)
   , k_3(0.0)
   , k_4(0.0)
 
+  , crane(true)
+
 {
 
 }
@@ -82,7 +84,7 @@ void Dako::preStep(state_vector_t& Y, double t)
     Q_UNUSED(t)
     if(edt_sw.lock())
     {
-        *((bool*)edt_sw.data()) = (U * Physics::kmh > 40);
+        *((bool*)edt_sw.data()) = (U * Physics::kmh > 40) * crane;
         edt_sw.unlock();
     }
 

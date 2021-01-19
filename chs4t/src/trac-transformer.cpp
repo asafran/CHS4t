@@ -5,6 +5,7 @@
 //------------------------------------------------------------------------------
 TracTransformer::TracTransformer(QObject *parent) : Device(parent)
     , U1(0.0)
+    , Ups(0.0)
     , K_sn(62.7)
     , Vps(0)
     , state_158(false)
@@ -70,12 +71,13 @@ void TracTransformer::preStep(state_vector_t &Y, double t)
     double fractpart;
     fractpart = modf(Y[0] , Q_NULLPTR);
 
-    ps_pos = static_cast<int>(round(Y[0]));
+    int pos = static_cast<int>(round(Y[0]));
 
-    if (position.contains(ps_pos))
+    if (position.contains(pos))
     {
-        cur_pos = position[ps_pos];
+        cur_pos = position[pos];
     }
+    ps_pos = static_cast<int>(round(Y[0]/2));
 
     QVector<ps_contact_t>::iterator it = contacts.begin();
     for(;it != contacts.end(); ++it)
@@ -92,7 +94,7 @@ void TracTransformer::preStep(state_vector_t &Y, double t)
     {
 
 
-        lock_shaft = static_cast<int>(round(Y[0] * 4)) % 8;
+        lock_shaft = static_cast<int>(round(Y[0] * 2)) % 8;
 
 
         //lock_shaft = static_cast<int>(Y[0] * 4) % 8;
@@ -121,7 +123,7 @@ void TracTransformer::preStep(state_vector_t &Y, double t)
                 else if(state_159)
                     ps_coeff = -1.0;
                 else
-                    ps_coeff *= hs_p(std::abs(fractpart) - 0.009);
+                    ps_coeff *= hs_p(std::abs(fractpart) - 0.01);
                 break;
             }
             case II:{
@@ -140,7 +142,7 @@ void TracTransformer::preStep(state_vector_t &Y, double t)
                 else if(!state_159)
                     ps_coeff = -1.0;
                 else
-                    ps_coeff *= hs_p(std::abs(fractpart) - 0.009);
+                    ps_coeff *= hs_p(std::abs(fractpart) - 0.01);
                 break;
             }
             case IV:{
@@ -187,11 +189,19 @@ void TracTransformer::load_config(CfgReader &cfg)
     while (secNode.nodeName() == "Position")
     {
         position_t pos;
+        position_t sub;
 
         cfg.getInt(secNode, "Number", pos.number);
         cfg.getDouble(secNode, "Voltage", pos.Unom);
         cfg.getString(secNode, "Name", pos.name);
 
+        pos.number *= 2;
+        sub.number = pos.number - 1;
+        sub.Unom = (pos.Unom + position[sub.number - 1].Unom) / 2;
+        sub.name = pos.name;
+
+
+        position.insert(sub.number, sub);
         position.insert(pos.number, pos);
 
         secNode = cfg.getNextSection();

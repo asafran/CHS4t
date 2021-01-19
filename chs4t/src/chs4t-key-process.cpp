@@ -14,5 +14,10 @@ void CHS4T::keyProcess()
         else
             eptSwitch.reset();
     }
+    if (getKeyState(KEY_L))
+    {
+
+        dako->setCrane(isShift());
+    }
 
 }

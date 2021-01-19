@@ -8,7 +8,7 @@
 void CHS4T::stepSignals()
 {
 
-    analogSignal[STRELKA_POS] = static_cast<float>((transformer015->getY(0) * hs_p(gv->getU_out())) + (hs_n(gv->getU_out() * 5.0))) / 42.0f;
+    analogSignal[STRELKA_POS] = static_cast<float>(((transformer015->getY(0)/2) * hs_p(gv->getU_out())) + ((0.0 == gv->getU_out() - std::numeric_limits<double>::epsilon()) * 5.0)) / 42.0f;
 
     analogSignal[STRELKA_AMP1] = static_cast<float>(motor[1]->getIa() / 1800.0);
 

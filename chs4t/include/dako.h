@@ -22,6 +22,7 @@ public:
     void setPtc(double value)   { ptc = value; }
     void setVelocity(double value)     { U = value; }
     void setPkvt(double value)  { p_kvt = value; }
+    void setCrane(bool value)  { crane = value; }
 
     double getP1() const    { return getY(1); }
     double getPy() const    { return getY(0); }
@@ -59,6 +60,8 @@ private:
     double k_2;
     double k_3;
     double k_4;
+
+    bool crane;
 
     QSharedMemory edt_sw;
 

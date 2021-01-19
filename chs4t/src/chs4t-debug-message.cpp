@@ -14,7 +14,7 @@ void CHS4T::stepDebugMsg(double t, double dt)
         .arg(BrakeReg->getAngle(), 10, 'f', 4)
         .arg(reservoir903->getPressure(), 10, 'f', 10)
         .arg(motor_fan[4]->getY(0), 10, 'f', 10)
-        .arg(motor_fan[4]->getU(), 10, 'f', 2)
-        .arg(brakeRekdyn->getAngle(), 10, 'f', 2)
-        .arg(pantographs[0]->getUout());
+        .arg(generator[0]->getIa(), 10, 'f', 2)
+        .arg(transformer015->getY(0), 10, 'f', 2)
+        .arg(vu[0]->getU_out());
 }

@@ -58,6 +58,8 @@ public:
     /// Вернуть текущее напряжение на тяговой обмотке
     double getTracVoltage() const;
 
+    double getQ() const { return static_cast<double>(ps_coeff != 0.0) * 0.01; }
+
     QString getPosName() const;
 
     float getLockShaft() { return static_cast<float>(static_cast<int>(round(getY(0) * 4)) % 8); }
@@ -82,6 +84,8 @@ private:
 
     /// Напряжение на первичной обмотке
     double  U1;    
+
+    double  Ups;
 
     /// Коэффициент трансформации обмотки СН
     double  K_sn;

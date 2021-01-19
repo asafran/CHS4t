@@ -68,7 +68,7 @@ void CHS4T::stepProtection(double t, double dt)
 //------------------------------------------------------------------------------
 void CHS4T::stepTractionControl(double t, double dt)
 {
-    ip = 1.75;
+    ip = 1.264;
 
     km21KR2->setControl(keys, control_signals);
     km21KR2->step(t, dt);

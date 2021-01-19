@@ -417,7 +417,7 @@ void CHS4T::initEDT()
 void CHS4T::initOtherEquipment()
 {
 
-    //horn = new CHS4tHorn();
+    horn = new CHS4tHorn();
 
 
     speed_meter = new SL2M();

@@ -83,7 +83,7 @@ void CHS4T::stepTractionControl(double t, double dt)
 
     for (it = motor.begin(); it != &motor[TED4]; ++it)
     {
-        (*it)->setU(vu[0]->getU_out());
+        (*it)->setU(vu[0]->getU_out() * hs_p(brc[1]->getBrake() - 1));
         (*it)->setDirection(brc[0]->getDirection());
     }
     for (; it != motor.end(); ++it)
@@ -246,7 +246,7 @@ void CHS4T::stepBrakesEquipment(double t, double dt)
     pvs["o358"]->overridePV(!pvs["b358"]->getState());
     pvs["o358"]->setPin(brakeRefRes->getPressure());
     pvs["o358"]->setPout(0.0);
-    pvs["o358"]->setK1(0.5);
+    pvs["o358"]->setK1(0.05);
 
     dako->setPgr(mainReservoir->getPressure());
     dako->setPkvt(zpk->getPressure2());

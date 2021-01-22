@@ -10,11 +10,11 @@ void CHS4T::stepSignals()
 
     analogSignal[STRELKA_POS] = static_cast<float>(((transformer015->getY(0)/2) * hs_p(gv->getU_out())) + ((0.0 == gv->getU_out() - std::numeric_limits<double>::epsilon()) * 5.0)) / 42.0f;
 
-    analogSignal[STRELKA_AMP1] = static_cast<float>(motor[1]->getIa() / 1800.0);
+    analogSignal[STRELKA_AMP1] = static_cast<float>(motor[1]->getIa() / 1000.0);
 
 
-    analogSignal[STRELKA_AMP3] = static_cast<float>(abs(generator[0]->getIa()) / 1800.0);
-    analogSignal[STRELKA_AMP2] = static_cast<float>(abs(generator[0]->getIf()) / 1800.0);
+    analogSignal[STRELKA_AMP3] = static_cast<float>(abs(generator[0]->getIa()) / 1000.0);
+    analogSignal[STRELKA_AMP2] = static_cast<float>(abs(generator[0]->getIf()) / 1000.0);
 
 
         //analogSignal[STRELKA_AMP3] = static_cast<float>(motor->getI56() / 1000.0);
